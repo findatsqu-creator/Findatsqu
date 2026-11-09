@@ -700,20 +700,23 @@
                         <label>📍 تحديد موقع الفقدان بدقة داخل الجامعة *</label>
                         <div class="location-picker-box">
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <select id="lostBuildingSelect" style="flex: 1; min-width: 160px;" required>
+                                <select id="lostBuildingSelect" style="flex: 1; min-width: 160px;" required onchange="toggleCustomLocation('lost')">
                                     <option value="">اختر المبنى / الكلية...</option>
                                     <option value="المكتبة الرئيسية">📚 المكتبة الرئيسية</option>
-                                    <option value="مجمع المطاعم">🍔 مجمع المطاعم</option>
-                                    <option value="مركز اللغات">🗣️ مركز اللغات</option>
+                                    <option value="مركز الدراسات التحضيرية">📚 مركز الدراسات التحضيرية</option>
+                                    <option value="مركز خدمات الطلبة">🏛️ مركز خدمات الطلبة</option>
+                                    <option value="الممر الطويل">🚶‍♂️ الممر الطويل</option>
                                     <option value="كلية الهندسة">⚙️ كلية الهندسة</option>
                                     <option value="كلية العلوم">🔬 كلية العلوم</option>
                                     <option value="كلية الآداب والعلوم الاجتماعية">📖 كلية الآداب</option>
                                     <option value="كلية الاقتصاد والعلوم السياسية">📊 كلية الاقتصاد</option>
                                     <option value="كلية الطب والعلوم الصحية">🩺 كلية الطب</option>
                                     <option value="المجمع الرياضي">⚽ المجمع الرياضي</option>
-                                    <option value="كلية العلوم الزراعية و البحرية">🌳كلية العلوم الزراعية و البحرية</option>
+                                    <option value="كلية العلوم الزراعية و البحرية">🌳 كلية العلوم الزراعية و البحرية</option>
                                     <option value="مركز القبول والتسجيل">📋 مركز القبول والتسجيل</option>
+                                    <option value="custom">✏️ أخرى (أدخل اسم المكان يدوياً)...</option>
                                 </select>
+                                <input type="text" id="lostCustomBuilding" placeholder="أدخل اسم الموقع..." style="flex: 1; min-width: 160px; display: none;" required>
                                 <input type="text" id="lostLocationDetail" placeholder="تفاصيل المكان (مثال: الطابق الأول - قاعة 12)" style="flex: 1; min-width: 160px;" required>
                             </div>
                         </div>
@@ -784,16 +787,19 @@
                         <label>📍 مكان العثور وموقع الاستلام الحالي *</label>
                         <div class="location-picker-box">
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <select id="foundBuildingSelect" style="flex: 1; min-width: 160px;" required>
+                                <select id="foundBuildingSelect" style="flex: 1; min-width: 160px;" required onchange="toggleCustomLocation('found')">
                                     <option value="">اختر المبنى / الكلية...</option>
                                     <option value="المكتبة الرئيسية">📚 المكتبة الرئيسية</option>
-                                    <option value="مجمع المطاعم">🍔 مجمع المطاعم</option>
-                                    <option value="مركز اللغات">🗣️ مركز اللغات</option>
+                                    <option value="مركز الدراسات التحضيرية">📚 مركز الدراسات التحضيرية</option>
+                                    <option value="مركز خدمات الطلبة">🏛️ مركز خدمات الطلبة</option>
+                                    <option value="الممر الطويل">🚶‍♂️ الممر الطويل</option>
                                     <option value="كلية الهندسة">⚙️ كلية الهندسة</option>
                                     <option value="كلية العلوم">🔬 كلية العلوم</option>
                                     <option value="المجمع الرياضي">⚽ المجمع الرياضي</option>
                                     <option value="مركز القبول والتسجيل">📋 مركز القبول والتسجيل</option>
+                                    <option value="custom">✏️ أخرى (أدخل اسم المكان يدوياً)...</option>
                                 </select>
+                                <input type="text" id="foundCustomBuilding" placeholder="أدخل اسم الموقع..." style="flex: 1; min-width: 160px; display: none;" required>
                                 <input type="text" id="foundLocationDetail" placeholder="تفاصيل موقع الاستلام (مثال: لدى مكتب الأمن)" style="flex: 1; min-width: 160px;" required>
                             </div>
                         </div>
@@ -853,6 +859,20 @@
           reader.readAsDataURL(file);
       });
   }
+
+  window.toggleCustomLocation = function(type) {
+    const selectElem = document.getElementById(`${type}BuildingSelect`);
+    const customInput = document.getElementById(`${type}CustomBuilding`);
+    
+    if (selectElem.value === 'custom') {
+      customInput.style.display = 'block';
+      customInput.required = true;
+    } else {
+      customInput.style.display = 'none';
+      customInput.required = false;
+      customInput.value = '';
+    }
+  };
 
   window.addEventListener('DOMContentLoaded', () => {
     const introOverlay = document.getElementById('intro-overlay');
@@ -930,7 +950,7 @@
   // دالة الحذف بالرقم السري (PIN)
   window.deleteReportWithPin = async function(docId, collectionName, correctPin) {
     const enteredPin = prompt("🔐 أدخل الرقم السري (PIN) الخاص بحذف هذا البلاغ:");
-    if (enteredPin === null) return; // إذا قام إلغاء
+    if (enteredPin === null) return;
 
     if (enteredPin !== correctPin) {
       alert("❌ الرقم السري غير صحيح! لا يمكنك حذف هذا البلاغ.");
@@ -957,6 +977,10 @@
     submitBtn.innerText = "جاري حفظ البلاغ والصورة... ⏳";
 
     try {
+      const buildingSelect = document.getElementById(`${type}BuildingSelect`).value;
+      const customBuilding = document.getElementById(`${type}CustomBuilding`).value.trim();
+      const finalBuilding = buildingSelect === 'custom' ? customBuilding : buildingSelect;
+
       if (type === 'lost') {
         const imageFile = document.getElementById('lostImage').files[0];
         const imageUrl = await readImageAsDataUrl(imageFile);
@@ -966,7 +990,7 @@
           category: document.getElementById('lostCategory').value,
           phone: document.getElementById('lostPhone').value,
           pin: document.getElementById('lostPin').value,
-          building: document.getElementById('lostBuildingSelect').value,
+          building: finalBuilding,
           locationDetail: document.getElementById('lostLocationDetail').value,
           desc: document.getElementById('lostDesc').value,
           imageUrl: imageUrl || "",
@@ -976,6 +1000,7 @@
         await addDoc(collection(db, "lost_items"), itemData);
         alert("✅ تم حفظ ونشر البلاغ بنجاح!");
         document.getElementById('lostForm').reset();
+        window.toggleCustomLocation('lost');
       } else if (type === 'found') {
         const imageFile = document.getElementById('foundImage').files[0];
         const imageUrl = await readImageAsDataUrl(imageFile);
@@ -985,7 +1010,7 @@
           category: document.getElementById('foundCategory').value,
           phone: document.getElementById('foundPhone').value,
           pin: document.getElementById('foundPin').value,
-          building: document.getElementById('foundBuildingSelect').value,
+          building: finalBuilding,
           locationDetail: document.getElementById('foundLocationDetail').value,
           desc: document.getElementById('foundDesc').value,
           imageUrl: imageUrl || "",
@@ -995,6 +1020,7 @@
         await addDoc(collection(db, "found_items"), itemData);
         alert("✅ تم حفظ ونشر البلاغ بنجاح!");
         document.getElementById('foundForm').reset();
+        window.toggleCustomLocation('found');
       }
     } catch (error) {
       console.error("خطأ أثناء الحفظ:", error);
@@ -1021,7 +1047,7 @@
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         const docId = docSnap.id;
-        const itemPin = data.pin || "0000"; // قيمة افتراضية في حال البلاغات القديمة
+        const itemPin = data.pin || "0000";
 
         const imageHTML = data.imageUrl 
           ? `<img src="${data.imageUrl}" alt="${data.name}" class="item-img">`
